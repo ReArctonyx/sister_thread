@@ -14,7 +14,7 @@ def start_server():
     host = "127.0.0.1"
     
     # tentukan port server
-    port = 8000
+    port = 12345
 
     # buat socket bertipe TCP
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -64,18 +64,17 @@ def clientThread(connection, ip, port, max_buffer_size = 4096):
     while is_active:
 
         # terima pesan dari client
-        client_input = connection.recv(max_buffer_size)
+        data = connection.recv(max_buffer_size)
         
         # dapatkan ukuran pesan
-        client_input_size = sys.getsizeof(client_input)
+        client_input_size = sys.getsizeof(data)
         
         # print jika pesan terlalu besar
         if client_input_size > max_buffer_size:
             print("The input size is greater than expected {}")
 
         # dapatkan pesan setelah didecode
-        decoded_input = client_input.decode("utf8").rstrip()
-        return decoded_input
+        client_input = data.decode()
 
         # jika "quit" maka flag koneksi = false, matikan koneksi
         if "quit" in client_input:

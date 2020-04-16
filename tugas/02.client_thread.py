@@ -10,7 +10,7 @@ def main():
     host = "127.0.0.1"
     
     # tentukan por server
-    port = 8000
+    port = 12345
 
     # lakukan koneksi ke server
     try:
