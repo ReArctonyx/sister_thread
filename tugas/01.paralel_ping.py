@@ -12,12 +12,12 @@ class ip_check(Thread):
     def __init__ (self,ip):
         Thread.__init__(self)
         self.ip = ip
-        self.status = -1
+        self.currents = -1
     
     # fungsi utama yang diekseskusi ketika thread berjalan
     def run(self):
         # lakukan ping dengan perintah ping -n (gunakan os.popen())
-        ping = os.popen("ping -q -c2 "+self.ip,"r")
+        ping = os.popen("ping -n 2 "+self.ip,"r")
         
         # loop forever
         while True:
@@ -29,17 +29,28 @@ class ip_check(Thread):
             
             
             # baca hasil per line dan temukan pola Received = x
-            igot = re.findall(ip_check.lifeline,line)
+            igot = re.findall(package,line)
             
             # tampilkan hasilnya
             if igot:
-                self.status = int(igot[0])
-                
+                self.currents = int(igot[0])
+    # fungsi untuk mengetahui status; 0 = tidak ada respon, 1 = hidup tapi ada loss, 2 = hidup
+    def status(self):
+        # 0 = tidak ada respon
+        if self.currents == 0: return "no response"
+        
+        # 1 = ada loss
+        elif self.currents == 1: return "alive, but 50 % package loss"
+        
+        # 2 = hidup
+        elif self.currents == 2: return "alive"
+
+        # -1 = seharusnya tidak terjadi
+        else: return "shouldn't occur"            
 
             
 # buat regex untuk mengetahui isi dari r"Received = (\d)"
-ip_check.lifeline = re.compile(r"(\d) received")
-report = ("No response","Partial Response","Alive")
+package = re.compile(r"Received = (\d)")
 
 
 # catat waktu awal
@@ -70,7 +81,7 @@ for el in pinglist:
     el.join()
     
     # dapatkan hasilnya
-    print ("Status from ",el.ip,"is",report[el.status])
+    print ("Status from ",el.ip,"is",el.status())
     
 
 # catat waktu berakhir
